@@ -15,10 +15,18 @@ rabbit_add_user_perm:
 	docker exec rabbit rabbitmqctl set_user_tags gorik administrator\
 
 rabbit_add_vhost:
-	docker exec rabbit rabbitmqctl add_vhost customers
+	docker exec rabbit rabbitmqctl add_vhost army
 
 
 
 rabbit_set_permissions:
-	docker exec rabbit rabbitmqctl set_permissions -p customers gorik ".*" ".*" ".*"
+	docker exec rabbit rabbitmqctl set_permissions -p army gorik ".*" ".*" ".*"
+
+
+rabbit_echange:
+	docker exec rabbit rabbitmqadmin declare  exchange name=army_event type=topic durable=true --vhost=army -u  gorik -p 1
+
+
+rabbit_perm_echange:
+	docker exec rabbit rabbitmqctl set_topic_permissions -p army gorik army_event ".*" ".*"
 
