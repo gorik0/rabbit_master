@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"golang.org/x/sync/errgroup"
 	"log"
 	"rabbit-master/internal"
 	"time"
@@ -22,20 +22,35 @@ func main() {
 	defer client.Close()
 
 	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
 	defer cancel()
+	msgBus, err := client.ConsumeMessages(ctx, "private_q", "commando", false)
+	HandlerErr(err, "message bus error")
 
-	msgBus, err := client.ConsumeMessages(ctx, "private_q", "private.to_sea", true)
-	HandlerErr(err, "consumer error")
+	g, ctx := errgroup.WithContext(ctx)
+
+	cha := make(chan struct{})
+	g.SetLimit(10)
 
 	go func() {
 
-		for msg := range msgBus {
-			fmt.Println("Gotta msg!!!  --->>>  " + string(msg.Body))
-		}
-	}()
-	time.Sleep(10 * time.Second)
+		for mes := range msgBus {
+			g.Go(func() error {
 
+				log.Println("Received message: ", mes.Body)
+				time.Sleep(time.Second * 10)
+				err := mes.Ack(false)
+				if err != nil {
+					log.Println("Error acknowledging message: ", err)
+					return err
+				}
+				log.Println("Acknowledged message: ", mes.Body)
+				return nil
+			})
+		}
+
+	}()
+	<-cha
 	//client.CreateQueue("private_q", true, false)
 	//HandlerErr(client.QueueBind("private_q", "private.*", "army_event"), "queue1 binding error")
 	//HandlerErr(client.QueueBind("private_q", "private.seaman.*", "army_event"), "queue1 binding error")

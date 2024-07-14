@@ -25,11 +25,27 @@ func main() {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	HandlerErr(client.SendMessage(ctx, "army_event", "private.to_forest", rabbit.Publishing{
-		ContentType:  "text/plain",
-		DeliveryMode: rabbit.Persistent,
-		Body:         []byte("Hello Forest!"),
-	}), "message sending error")
+	for i := 0; i < 10; i++ {
+
+		err := client.SendMessage(ctx, "army_event", "private.vasya", rabbit.Publishing{
+			ContentType:  "text/plain",
+			Body:         []byte("Hello World"),
+			DeliveryMode: rabbit.Transient,
+		})
+		if err != nil {
+			HandlerErr(err, "Error while send messs")
+		}
+		err = client.SendMessage(ctx, "army_event", "private.pyatro", rabbit.Publishing{
+			ContentType:  "text/plain",
+			Body:         []byte("Hello World"),
+			DeliveryMode: rabbit.Persistent,
+		})
+		if err != nil {
+			HandlerErr(err, "Error while send messs")
+		}
+
+	}
+
 	time.Sleep(10 * time.Second)
 
 }
