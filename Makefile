@@ -24,7 +24,10 @@ rabbit_set_permissions:
 
 
 rabbit_echange:
-	docker exec rabbit rabbitmqadmin declare  exchange name=army_event type=topic durable=true --vhost=army -u  gorik -p 1
+	docker exec rabbit rabbitmqadmin declare  exchange name=army_event type=fanout durable=true --vhost=army -u  gorik -p 1
+
+rabbit_del_echange:
+	docker exec rabbit rabbitmqadmin delete  exchange name=army_event --vhost=army -u  gorik -p 1
 
 
 rabbit_perm_echange:

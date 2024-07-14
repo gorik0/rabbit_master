@@ -37,14 +37,14 @@ func main() {
 		for mes := range msgBus {
 			g.Go(func() error {
 
-				log.Println("Received message: ", mes.Body)
+				log.Println("Received message: ", string(mes.Body))
 				time.Sleep(time.Second * 10)
 				err := mes.Ack(false)
 				if err != nil {
 					log.Println("Error acknowledging message: ", err)
 					return err
 				}
-				log.Println("Acknowledged message: ", mes.Body)
+				log.Println("Acknowledged message: ")
 				return nil
 			})
 		}
