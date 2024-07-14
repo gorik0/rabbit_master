@@ -21,10 +21,20 @@ func main() {
 	HandlerErr(err, "client error")
 	defer client.Close()
 
+	//:::; CREATE QUEUE ::::
+
+	queue, err := client.CreateQueue("", true, true)
+	HandlerErr(err, "create queue error")
+
+	//:::; CREATE BINDING (with no key, in case of fanout  exch-type) ::::
+
+	err = client.QueueBind(queue.Name, "", "army_event")
+	HandlerErr(err, "create binding error")
+
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
 	defer cancel()
-	msgBus, err := client.ConsumeMessages(ctx, "private_q", "commando", false)
+	msgBus, err := client.ConsumeMessages(ctx, queue.Name, "commando", false)
 	HandlerErr(err, "message bus error")
 
 	g, ctx := errgroup.WithContext(ctx)

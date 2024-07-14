@@ -35,14 +35,6 @@ func main() {
 		if err != nil {
 			HandlerErr(err, "Error while send messs")
 		}
-		err = client.SendMessage(ctx, "army_event", "private.pyatro", rabbit.Publishing{
-			ContentType:  "text/plain",
-			Body:         []byte("Hello World"),
-			DeliveryMode: rabbit.Persistent,
-		})
-		if err != nil {
-			HandlerErr(err, "Error while send messs")
-		}
 
 	}
 

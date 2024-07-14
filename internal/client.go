@@ -32,9 +32,9 @@ func (rc *RabbitClient) Close() {
 	rc.ch.Close()
 }
 
-func (rc *RabbitClient) CreateQueue(name string, durable, autoDelete bool) error {
-	_, err := rc.ch.QueueDeclare(name, durable, autoDelete, false, false, nil)
-	return err
+func (rc *RabbitClient) CreateQueue(name string, durable, autoDelete bool) (rabbit.Queue, error) {
+	queu, err := rc.ch.QueueDeclare(name, durable, autoDelete, false, false, nil)
+	return queu, err
 }
 func (rc *RabbitClient) QueueBind(name string, binding string, exchange string) error {
 	return rc.ch.QueueBind(name, binding, exchange, false, nil)
